@@ -148,6 +148,70 @@ server.tool(
 );
 
 server.tool(
+  'cyclone_build_monitoring_brief',
+  'Build a practical monitoring brief for a South-West Indian Ocean cyclone situation, with official sources, next MCP calls, and safety boundaries.',
+  {
+    territory: z
+      .enum(['reunion', 'mayotte', 'madagascar', 'mauritius', 'mozambique', 'basin'])
+      .default('basin')
+      .describe('Territory or basin focus for the monitoring brief.'),
+  },
+  async ({ territory }) => {
+    const vigilanceLinks = [
+      {
+        territory: 'reunion',
+        label: 'Météo-France vigilance La Réunion',
+        url: SOURCES.meteoFranceReunionVigilance,
+      },
+      {
+        territory: 'mayotte',
+        label: 'Météo-France vigilance Mayotte',
+        url: SOURCES.meteoFranceMayotteVigilance,
+      },
+    ].filter((link) => territory === 'basin' || territory === link.territory);
+
+    return jsonResult({
+      territory,
+      checked_at: new Date().toISOString(),
+      official_sources_to_check: [
+        {
+          label: 'RSMC La Réunion current products',
+          url: SOURCES.rsmc,
+          use_for: 'Active systems, official advisories, track maps, and basin-level cyclone products.',
+        },
+        ...vigilanceLinks.map((link) => ({
+          label: link.label,
+          url: link.url,
+          use_for: 'Local vigilance status and public instructions.',
+        })),
+        {
+          label: 'WMO latest advisories directory',
+          url: SOURCES.wmoLatestAdvisories,
+          use_for: 'Cross-checking official RSMC advisory directories.',
+        },
+        {
+          label: 'GDACS tropical cyclones',
+          url: SOURCES.gdacsCyclones,
+          use_for: 'Secondary impact and disaster-alert context.',
+        },
+      ],
+      suggested_mcp_flow: [
+        'Call cyclone_get_current_activity with include_page_excerpt=true.',
+        'Open the returned official RSMC operational links for the latest bulletin and track map.',
+        'Call cyclone_get_vigilance_links for local Météo-France vigilance pages.',
+        'If a cyclone position is known, call cyclone_estimate_commune_exposure for a first commune-distance screen.',
+        'Use cyclone_explain_alert_level only to explain terms, not to infer the current official alert.',
+      ],
+      safety_boundaries: [
+        'Do not infer an official alert level from distance alone.',
+        'Do not replace prefecture, civil-protection, RSMC, or Météo-France instructions.',
+        'Mention timestamps and source URLs when summarizing active cyclone information.',
+      ],
+    });
+  }
+);
+
+server.tool(
   'cyclone_explain_alert_level',
   'Explain French cyclone alert levels used around La Réunion/Mayotte: pre-alert, orange, red, purple, and safeguard phase.',
   {

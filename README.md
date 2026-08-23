@@ -10,6 +10,7 @@ It is designed for Réunion, Mayotte, Madagascar, Mauritius, the Mozambique Chan
 - `cyclone_get_current_activity` — fetch the RSMC La Réunion current public page and discover operational product links.
 - `cyclone_get_rsmc_archives` — fetch public RSMC archive links.
 - `cyclone_get_vigilance_links` — return official Météo-France vigilance links for La Réunion and Mayotte.
+- `cyclone_build_monitoring_brief` — build an agent-ready monitoring flow with source priorities and safety boundaries.
 - `cyclone_explain_alert_level` — explain pre-alert, orange, red, purple, and safeguard cyclone phases.
 - `cyclone_estimate_commune_exposure` — rank Réunion/Mayotte communes by distance to a cyclone position.
 - `cyclone_list_communes` — list built-in commune centroids used by the distance helper.
